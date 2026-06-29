@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relocation Budget Tool</title>
+  <title>Relocation Budget Planner</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       background: #0f1117;
       color: #e2e8f0;
@@ -15,7 +14,6 @@
       min-height: 100vh;
       padding: 20px 16px 40px;
     }
-
     h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.3px; }
     .subtitle { color: #64748b; font-size: 13px; margin-top: 4px; }
     .header { margin-bottom: 24px; }
@@ -29,342 +27,294 @@
     @media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; } }
     @media (max-width: 480px) {
       .input-row { flex-wrap: wrap; }
-      .input-label { white-space: normal; overflow: visible; text-overflow: unset; min-width: 100%; }
+      .input-label { white-space: normal; min-width: 100%; }
       .input-wrap, .pct-wrap { width: 100%; }
-      .dollar-input, .pct-input { text-align: left; padding-left: 22px; }
+      .field-input { text-align: left !important; }
       .chart-summary { grid-template-columns: 1fr !important; }
     }
 
-    .card { background: #161b27; border: 1px solid #1e2535; border-radius: 10px; overflow: hidden; }
-    .card-header {
-      background: #1a2033; padding: 12px 14px; border-bottom: 1px solid #1e2535;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    }
+    .card { background: #161b27; border: 1px solid #1e2535; border-radius: 10px; overflow: hidden; border-top-width: 2px; }
+    .card-header { background: #1a2033; padding: 12px 14px; border-bottom: 1px solid #1e2535; display: flex; align-items: center; justify-content: space-between; }
     .scenario-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
-    .reset-btn {
-      background: none; border: 1px solid #2d3748; border-radius: 5px;
-      color: #64748b; font-size: 11px; cursor: pointer; padding: 3px 8px; transition: all 0.15s;
-    }
+    .reset-btn { background: none; border: 1px solid #2d3748; border-radius: 5px; color: #64748b; font-size: 11px; cursor: pointer; padding: 3px 8px; }
     .reset-btn:hover { border-color: #4a5568; color: #94a3b8; }
     .card-body { padding: 14px; }
 
     .city-select {
       width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 6px;
-      color: #e2e8f0; font-size: 13px; padding: 7px 10px; margin-bottom: 14px;
+      color: #e2e8f0; font-size: 13px; padding: 7px 10px 7px 10px; margin-bottom: 14px;
       cursor: pointer; outline: none; appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
     }
-    .city-select:focus { border-color: #3b82f6; }
 
-    .section-title {
-      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
-      color: #475569; margin: 14px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #1e2535;
-    }
+    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; color: #475569; margin: 14px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #1e2535; }
 
     .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 8px; }
     .input-label { color: #94a3b8; font-size: 12px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .input-wrap { position: relative; width: 100px; flex-shrink: 0; }
-    .input-prefix { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
-    .dollar-input {
-      width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 5px;
-      color: #e2e8f0; font-size: 13px; padding: 5px 6px 5px 18px; text-align: right; outline: none; transition: border-color 0.15s;
-    }
-    .dollar-input:focus { border-color: #3b82f6; }
-    .dollar-input[readonly] { color: #64748b; cursor: not-allowed; background: #0a0d14; }
-
+    .input-wrap .pfx { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
     .pct-wrap { position: relative; width: 100px; flex-shrink: 0; }
-    .pct-suffix { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
-    .pct-input {
+    .pct-wrap .sfx { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
+
+    .field-input {
       width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 5px;
-      color: #e2e8f0; font-size: 13px; padding: 5px 22px 5px 8px; text-align: right; outline: none; transition: border-color 0.15s;
+      color: #e2e8f0; font-size: 13px; outline: none; transition: border-color 0.15s;
     }
-    .pct-input:focus { border-color: #3b82f6; }
-    .pct-input[readonly] { color: #64748b; cursor: not-allowed; background: #0a0d14; }
+    .field-input:focus { border-color: #3b82f6; }
+    .field-input.dollar { padding: 5px 6px 5px 18px; text-align: right; }
+    .field-input.pct    { padding: 5px 22px 5px 8px; text-align: right; }
+    .field-input[readonly] { color: #64748b; cursor: not-allowed; background: #0a0d14; }
 
     .output-block { margin-top: 14px; background: #0f1117; border: 1px solid #1e2535; border-radius: 7px; overflow: hidden; }
     .output-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; border-bottom: 1px solid #1a2033; font-size: 12px; }
     .output-row:last-child { border-bottom: none; }
-    .output-label { color: #64748b; }
-    .output-value { color: #94a3b8; font-variant-numeric: tabular-nums; }
-    .output-value.negative { color: #f87171; }
+    .out-label { color: #64748b; }
+    .out-val { color: #94a3b8; font-variant-numeric: tabular-nums; }
+    .out-val.neg { color: #f87171; }
+    .out-val.blue { color: #93c5fd; }
 
     .leftover-row { background: #0d1520; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e3a5f; }
     .leftover-label { font-size: 12px; font-weight: 600; color: #93c5fd; }
-    .leftover-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .leftover-value.positive { color: #4ade80; }
-    .leftover-value.negative { color: #f87171; }
+    .leftover-val { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .leftover-val.pos { color: #4ade80; }
+    .leftover-val.neg { color: #f87171; }
 
     .chart-section { background: #161b27; border: 1px solid #1e2535; border-radius: 10px; padding: 20px; }
     .chart-title { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 16px; }
-    .recharts-cartesian-axis-tick-value { fill: #475569 !important; font-size: 11px; }
-    .recharts-legend-item-text { color: #94a3b8 !important; font-size: 12px !important; }
-    .recharts-tooltip-wrapper { outline: none; }
+    .chart-wrap { position: relative; height: 260px; }
+
+    .chart-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .summary-cell { background: #0f1117; border-radius: 7px; padding: 10px 14px; text-align: center; }
+    .summary-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px; }
+    .summary-city { font-size: 11px; color: #64748b; margin-bottom: 2px; }
+    .summary-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .summary-val.pos { color: #4ade80; }
+    .summary-val.neg { color: #f87171; }
+    .summary-mo { font-size: 11px; font-weight: 400; color: #475569; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="header">
+      <h1>Relocation Budget Planner</h1>
+      <p class="subtitle">Rough planning estimate — not tax advice. 2025 federal brackets, $15k standard deduction.</p>
+    </div>
+    <div class="cards-grid" id="cards"></div>
+    <div class="chart-section">
+      <div class="chart-title">Monthly Budget Comparison</div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      <div class="chart-summary" id="summary"></div>
+    </div>
+  </div>
 
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/htm@3/dist/htm.umd.js"></script>
-  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-
+  <script src="https://unpkg.com/chart.js@4/dist/chart.umd.min.js"></script>
   <script>
-    const html = htm.bind(React.createElement);
-    const { useState, useCallback } = React;
-    const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Cell } = Recharts;
-
-    // ── Tax helpers ──────────────────────────────────────────────────────────
-
-    const FED_BRACKETS = [
-      { rate: 0.10, limit: 11925 },
-      { rate: 0.12, limit: 48475 },
-      { rate: 0.22, limit: 103350 },
-      { rate: 0.24, limit: 197300 },
-      { rate: 0.32, limit: 250525 },
-      { rate: 0.35, limit: 626350 },
-      { rate: 0.37, limit: Infinity },
+    // ── Tax ──────────────────────────────────────────────────────────────────
+    const FED = [
+      [11925, .10], [48475, .12], [103350, .22],
+      [197300, .24], [250525, .32], [626350, .35], [1e9, .37]
     ];
-
-    function calcFederalTax(gross) {
-      const taxable = Math.max(0, gross - 15000);
+    function fedTax(g) {
+      const t = Math.max(0, g - 15000);
       let tax = 0, prev = 0;
-      for (const { rate, limit } of FED_BRACKETS) {
-        if (taxable <= prev) break;
-        tax += (Math.min(taxable, limit) - prev) * rate;
-        prev = limit;
+      for (const [lim, rate] of FED) {
+        tax += (Math.min(t, lim) - prev) * rate;
+        prev = lim;
+        if (t <= lim) break;
       }
       return tax;
     }
-
-    function calcTaxes(gross, statePct) {
-      const fed = calcFederalTax(gross);
-      const state = gross * (statePct / 100);
-      const fica = Math.min(gross, 176100) * 0.062 + gross * 0.0145;
-      return {
-        fedMonthly: fed / 12,
-        stateMonthly: state / 12,
-        ficaMonthly: fica / 12,
-        totalMonthly: (fed + state + fica) / 12,
-      };
+    function taxes(g, pct) {
+      const fed = fedTax(g), state = g * pct / 100;
+      const fica = Math.min(g, 176100) * .062 + g * .0145;
+      return { fed: fed/12, state: state/12, fica: fica/12, total: (fed+state+fica)/12 };
     }
-
     function fmt(n) {
-      const s = Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
-      return (n < 0 ? '-$' : '$') + s;
+      return (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', {maximumFractionDigits: 0});
     }
 
-    // ── Presets & defaults ────────────────────────────────────────────────────
-
+    // ── Config ───────────────────────────────────────────────────────────────
     const PRESETS = [
-      { label: "SLC / Lehi, UT (Baseline)",      statePct: 4.65 },
-      { label: "Gilbert / Mesa, AZ",              statePct: 2.5  },
-      { label: "Spokane, WA",                     statePct: 0    },
-      { label: "Coeur d'Alene / Rathdrum, ID",    statePct: 5.8  },
-      { label: "Custom",                          statePct: null },
+      { label: "SLC / Lehi, UT (Baseline)",    pct: 4.65 },
+      { label: "Gilbert / Mesa, AZ",            pct: 2.5  },
+      { label: "Spokane, WA",                   pct: 0    },
+      { label: "Coeur d'Alene / Rathdrum, ID",  pct: 5.8  },
+      { label: "Custom",                         pct: null },
     ];
-
-    const DEFAULTS = [
-      { city: 0, customPct: 4.65, salary: 95000, rent: 1850, car: 650, groceries: 500, subs: 200, debt: 400, misc: 250 },
-      { city: 1, customPct: 2.5,  salary: 95000, rent: 2100, car: 650, groceries: 520, subs: 200, debt: 400, misc: 250 },
-      { city: 2, customPct: 0,    salary: 95000, rent: 1700, car: 650, groceries: 480, subs: 200, debt: 400, misc: 250 },
-    ];
-
     const COLORS = ['#3b82f6', '#a78bfa', '#34d399'];
     const NAMES  = ['Scenario A', 'Scenario B', 'Scenario C'];
+    const DEFAULTS = [
+      { city:0, cpct:4.65, salary:95000, rent:1850, car:650, groceries:500, subs:200, debt:400, misc:250 },
+      { city:1, cpct:2.5,  salary:95000, rent:2100, car:650, groceries:520, subs:200, debt:400, misc:250 },
+      { city:2, cpct:0,    salary:95000, rent:1700, car:650, groceries:480, subs:200, debt:400, misc:250 },
+    ];
 
-    // ── DollarInput ───────────────────────────────────────────────────────────
+    const state = DEFAULTS.map(d => ({ ...d }));
 
-    function DollarInput({ value, onChange, readOnly }) {
-      const [raw, setRaw] = useState(String(value));
-      const [focused, setFocused] = useState(false);
-      return html`
-        <div className="input-wrap">
-          <span className="input-prefix">$</span>
-          <input
-            className="dollar-input"
-            type="number" min="0" step="50"
-            readOnly=${!!readOnly}
-            value=${focused ? raw : String(value)}
-            onFocus=${() => { setFocused(true); setRaw(String(value)); }}
-            onBlur=${() => { setFocused(false); const n = parseFloat(raw); if (!isNaN(n) && n >= 0) onChange(n); }}
-            onChange=${e => { setRaw(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n) && n >= 0) onChange(n); }}
-          />
-        </div>`;
-    }
+    // ── Chart ────────────────────────────────────────────────────────────────
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: [], datasets: [
+        { label: 'Take-home', backgroundColor: '#3b82f6', borderRadius: 3, data: [] },
+        { label: 'Expenses',  backgroundColor: '#475569', borderRadius: 3, data: [] },
+        { label: 'Leftover',  backgroundColor: [], borderRadius: 3, data: [] },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#94a3b8', font: { size: 12 } } },
+          tooltip: {
+            backgroundColor: '#1a2033', borderColor: '#2d3748', borderWidth: 1,
+            titleColor: '#94a3b8', bodyColor: '#cbd5e1',
+            callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#475569' }, grid: { display: false }, border: { display: false } },
+          y: { ticks: { color: '#475569', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#1e2535' }, border: { display: false } }
+        }
+      }
+    });
 
-    // ── PctInput ──────────────────────────────────────────────────────────────
-
-    function PctInput({ value, onChange, readOnly }) {
-      const [raw, setRaw] = useState(String(value));
-      const [focused, setFocused] = useState(false);
-      return html`
-        <div className="pct-wrap">
-          <input
-            className="pct-input"
-            type="number" min="0" max="20" step="0.1"
-            readOnly=${!!readOnly}
-            value=${focused ? raw : String(value)}
-            onFocus=${() => { setFocused(true); setRaw(String(value)); }}
-            onBlur=${() => { setFocused(false); const n = parseFloat(raw); if (!isNaN(n)) onChange(n); }}
-            onChange=${e => { setRaw(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n)) onChange(n); }}
-          />
-          <span className="pct-suffix">%</span>
-        </div>`;
-    }
-
-    // ── ScenarioCard ──────────────────────────────────────────────────────────
-
-    function ScenarioCard({ idx, sc, onChange, onReset }) {
-      const isCustom = sc.city === PRESETS.length - 1;
-      const statePct = isCustom ? sc.customPct : PRESETS[sc.city].statePct;
-      const taxes = calcTaxes(sc.salary, statePct);
+    // ── Render ───────────────────────────────────────────────────────────────
+    function calc(sc) {
+      const pct = sc.city === PRESETS.length - 1 ? sc.cpct : PRESETS[sc.city].pct;
+      const tx = taxes(sc.salary, pct);
       const gross = sc.salary / 12;
-      const takeHome = gross - taxes.totalMonthly;
+      const takeHome = gross - tx.total;
       const expenses = sc.rent + sc.car + sc.groceries + sc.subs + sc.debt + sc.misc;
-      const leftover = takeHome - expenses;
-      const set = k => v => onChange({ ...sc, [k]: v });
-      const color = COLORS[idx];
+      return { pct, tx, gross, takeHome, expenses, leftover: takeHome - expenses };
+    }
 
-      const expenseRows = [
-        ['Rent / mortgage',      'rent'],
-        ['Car (pmt + ins + gas)','car'],
-        ['Groceries',            'groceries'],
-        ['Subs / hobbies',       'subs'],
-        ['Debt payments',        'debt'],
-        ['Miscellaneous',        'misc'],
+    function renderCard(i) {
+      const sc = state[i];
+      const color = COLORS[i];
+      const { pct, tx, gross, takeHome, expenses, leftover } = calc(sc);
+      const isCustom = sc.city === PRESETS.length - 1;
+
+      const expRows = [
+        ['Rent / mortgage', 'rent'], ['Car (pmt + ins + gas)', 'car'],
+        ['Groceries', 'groceries'], ['Subs / hobbies', 'subs'],
+        ['Debt payments', 'debt'], ['Miscellaneous', 'misc'],
       ];
 
-      return html`
-        <div className="card" style=${{ borderTopColor: color, borderTopWidth: 2 }}>
-          <div className="card-header">
-            <span className="scenario-label" style=${{ color }}>${NAMES[idx]}</span>
-            <button className="reset-btn" onClick=${onReset}>Reset</button>
+      return `
+        <div class="card" style="border-top-color:${color}">
+          <div class="card-header">
+            <span class="scenario-label" style="color:${color}">${NAMES[i]}</span>
+            <button class="reset-btn" onclick="reset(${i})">Reset</button>
           </div>
-          <div className="card-body">
-            <select className="city-select" value=${sc.city}
-              onChange=${e => {
-                const ci = Number(e.target.value);
-                onChange({ ...sc, city: ci, customPct: PRESETS[ci].statePct ?? sc.customPct });
-              }}>
-              ${PRESETS.map((p, i) => html`<option key=${i} value=${i}>${p.label}</option>`)}
+          <div class="card-body">
+            <select class="city-select" onchange="setCity(${i},this.value)">
+              ${PRESETS.map((p,j) => `<option value="${j}" ${sc.city===j?'selected':''}>${p.label}</option>`).join('')}
             </select>
 
-            <div className="section-title">Income</div>
-            <div className="input-row">
-              <span className="input-label">Annual salary</span>
-              <${DollarInput} value=${sc.salary} onChange=${set('salary')} />
+            <div class="section-title">Income</div>
+            <div class="input-row">
+              <span class="input-label">Annual salary</span>
+              <div class="input-wrap"><span class="pfx">$</span>
+                <input class="field-input dollar" type="number" min="0" step="1000"
+                  value="${sc.salary}" onchange="setVal(${i},'salary',this.value)" />
+              </div>
             </div>
-            <div className="input-row">
-              <span className="input-label">State income tax</span>
-              <${PctInput} value=${statePct} readOnly=${!isCustom}
-                onChange=${v => onChange({ ...sc, customPct: v })} />
-            </div>
-
-            <div className="section-title">Monthly Expenses</div>
-            ${expenseRows.map(([label, key]) => html`
-              <div className="input-row" key=${key}>
-                <span className="input-label">${label}</span>
-                <${DollarInput} value=${sc[key]} onChange=${set(key)} />
-              </div>`)}
-
-            <div className="output-block">
-              <div className="output-row"><span className="output-label">Monthly gross</span><span className="output-value">${fmt(gross)}</span></div>
-              <div className="output-row"><span className="output-label">Federal tax</span><span className="output-value negative">−${fmt(taxes.fedMonthly)}</span></div>
-              <div className="output-row"><span className="output-label">State tax (${statePct}%)</span><span className="output-value negative">−${fmt(taxes.stateMonthly)}</span></div>
-              <div className="output-row"><span className="output-label">FICA (SS + Medicare)</span><span className="output-value negative">−${fmt(taxes.ficaMonthly)}</span></div>
-              <div className="output-row"><span className="output-label">Monthly take-home</span><span className="output-value" style=${{ color: '#93c5fd' }}>${fmt(takeHome)}</span></div>
-              <div className="output-row"><span className="output-label">Total expenses</span><span className="output-value negative">−${fmt(expenses)}</span></div>
+            <div class="input-row">
+              <span class="input-label">State income tax</span>
+              <div class="pct-wrap">
+                <input class="field-input pct" type="number" min="0" max="20" step="0.1"
+                  value="${pct}" ${!isCustom ? 'readonly' : ''}
+                  onchange="setVal(${i},'cpct',this.value)" />
+                <span class="sfx">%</span>
+              </div>
             </div>
 
-            <div className="leftover-row">
-              <span className="leftover-label">Monthly leftover</span>
-              <span className=${'leftover-value ' + (leftover >= 0 ? 'positive' : 'negative')}>${fmt(leftover)}</span>
+            <div class="section-title">Monthly Expenses</div>
+            ${expRows.map(([label, key]) => `
+              <div class="input-row">
+                <span class="input-label">${label}</span>
+                <div class="input-wrap"><span class="pfx">$</span>
+                  <input class="field-input dollar" type="number" min="0" step="50"
+                    value="${sc[key]}" onchange="setVal(${i},'${key}',this.value)" />
+                </div>
+              </div>`).join('')}
+
+            <div class="output-block">
+              <div class="output-row"><span class="out-label">Monthly gross</span><span class="out-val">${fmt(gross)}</span></div>
+              <div class="output-row"><span class="out-label">Federal tax</span><span class="out-val neg">&minus;${fmt(tx.fed)}</span></div>
+              <div class="output-row"><span class="out-label">State tax (${pct}%)</span><span class="out-val neg">&minus;${fmt(tx.state)}</span></div>
+              <div class="output-row"><span class="out-label">FICA (SS + Medicare)</span><span class="out-val neg">&minus;${fmt(tx.fica)}</span></div>
+              <div class="output-row"><span class="out-label">Monthly take-home</span><span class="out-val blue">${fmt(takeHome)}</span></div>
+              <div class="output-row"><span class="out-label">Total expenses</span><span class="out-val neg">&minus;${fmt(expenses)}</span></div>
+            </div>
+            <div class="leftover-row">
+              <span class="leftover-label">Monthly leftover</span>
+              <span class="leftover-val ${leftover >= 0 ? 'pos' : 'neg'}">${fmt(leftover)}</span>
             </div>
           </div>
         </div>`;
     }
 
-    // ── ComparisonChart ───────────────────────────────────────────────────────
-
-    function ComparisonChart({ scenarios }) {
-      const data = scenarios.map((sc, i) => {
+    function updateChart() {
+      const results = state.map((sc, i) => {
+        const { takeHome, expenses, leftover } = calc(sc);
         const isCustom = sc.city === PRESETS.length - 1;
-        const statePct = isCustom ? sc.customPct : PRESETS[sc.city].statePct;
-        const taxes = calcTaxes(sc.salary, statePct);
-        const takeHome = Math.round(sc.salary / 12 - taxes.totalMonthly);
-        const expenses = Math.round(sc.rent + sc.car + sc.groceries + sc.subs + sc.debt + sc.misc);
-        const leftover = takeHome - expenses;
         const name = isCustom ? 'Custom' : PRESETS[sc.city].label.split(',')[0];
-        return { name, 'Take-home': takeHome, 'Expenses': expenses, 'Leftover': leftover };
+        return { name, takeHome: Math.round(takeHome), expenses: Math.round(expenses), leftover: Math.round(leftover) };
       });
 
-      function CustomTooltip({ active, payload, label }) {
-        if (!active || !payload || !payload.length) return null;
-        return html`
-          <div style=${{ background: '#1a2033', border: '1px solid #2d3748', borderRadius: 7, padding: '10px 14px', fontSize: 12 }}>
-            <div style=${{ color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>${label}</div>
-            ${payload.map(p => html`<div key=${p.name} style=${{ color: p.color, marginBottom: 3 }}>${p.name}: <strong>${fmt(p.value)}</strong></div>`)}
-          </div>`;
-      }
+      chart.data.labels = results.map(r => r.name);
+      chart.data.datasets[0].data = results.map(r => r.takeHome);
+      chart.data.datasets[1].data = results.map(r => r.expenses);
+      chart.data.datasets[2].data = results.map(r => r.leftover);
+      chart.data.datasets[2].backgroundColor = results.map(r => r.leftover >= 0 ? '#4ade80' : '#f87171');
+      chart.update();
 
-      return html`
-        <div className="chart-section">
-          <div className="chart-title">Monthly Budget Comparison</div>
-          <${ResponsiveContainer} width="100%" height=${260}>
-            <${BarChart} data=${data} barGap=${4} barCategoryGap="30%">
-              <${CartesianGrid} stroke="#1e2535" vertical=${false} />
-              <${XAxis} dataKey="name" tick=${{ fill: '#475569', fontSize: 11 }} axisLine=${false} tickLine=${false} />
-              <${YAxis} tickFormatter=${v => '$' + (v/1000).toFixed(0) + 'k'} tick=${{ fill: '#475569', fontSize: 11 }} axisLine=${false} tickLine=${false} width=${48} />
-              <${Tooltip} content=${html`<${CustomTooltip} />`} cursor=${{ fill: 'rgba(255,255,255,0.03)' }} />
-              <${Legend} wrapperStyle=${{ fontSize: 12, paddingTop: 12 }} />
-              <${ReferenceLine} y=${0} stroke="#2d3748" />
-              <${Bar} dataKey="Take-home" fill="#3b82f6" radius=${[3,3,0,0]} />
-              <${Bar} dataKey="Expenses" fill="#475569" radius=${[3,3,0,0]} />
-              <${Bar} dataKey="Leftover" radius=${[3,3,0,0]} fill="#4ade80">
-                ${data.map((d, i) => html`<${Cell} key=${i} fill=${d['Leftover'] >= 0 ? '#4ade80' : '#f87171'} />`)}
-              </${Bar}>
-            </${BarChart}>
-          </${ResponsiveContainer}>
-
-          <div className="chart-summary" style=${{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 16 }}>
-            ${data.map((d, i) => html`
-              <div key=${i} style=${{ background: '#0f1117', border: '1px solid ' + COLORS[i] + '33', borderRadius: 7, padding: '10px 14px', textAlign: 'center' }}>
-                <div style=${{ fontSize: 10, color: COLORS[i], fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 4 }}>${NAMES[i]}</div>
-                <div style=${{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>${d.name}</div>
-                <div style=${{ fontSize: 18, fontWeight: 700, color: d['Leftover'] >= 0 ? '#4ade80' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
-                  ${fmt(d['Leftover'])}<span style=${{ fontSize: 11, fontWeight: 400, color: '#475569' }}>/mo</span>
-                </div>
-              </div>`)}
-          </div>
-        </div>`;
+      document.getElementById('summary').innerHTML = results.map((r, i) => `
+        <div class="summary-cell" style="border:1px solid ${COLORS[i]}33">
+          <div class="summary-name" style="color:${COLORS[i]}">${NAMES[i]}</div>
+          <div class="summary-city">${r.name}</div>
+          <div class="summary-val ${r.leftover >= 0 ? 'pos' : 'neg'}">${fmt(r.leftover)}<span class="summary-mo">/mo</span></div>
+        </div>`).join('');
     }
 
-    // ── App ───────────────────────────────────────────────────────────────────
-
-    function App() {
-      const [scenarios, setScenarios] = useState(DEFAULTS);
-      const update = useCallback((i, sc) => setScenarios(prev => prev.map((s, j) => j === i ? sc : s)), []);
-      const reset  = useCallback((i)     => setScenarios(prev => prev.map((s, j) => j === i ? DEFAULTS[i] : s)), []);
-
-      return html`
-        <div style=${{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="header">
-            <h1>Relocation Budget Planner</h1>
-            <p className="subtitle">Rough planning estimate — not tax advice. 2025 federal brackets, $15k standard deduction.</p>
-          </div>
-          <div className="cards-grid">
-            ${scenarios.map((sc, i) => html`
-              <${ScenarioCard} key=${i} idx=${i} sc=${sc}
-                onChange=${s => update(i, s)} onReset=${() => reset(i)} />`)}
-          </div>
-          <${ComparisonChart} scenarios=${scenarios} />
-        </div>`;
+    function render() {
+      document.getElementById('cards').innerHTML = state.map((_, i) => renderCard(i)).join('');
+      updateChart();
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+    // ── Actions ───────────────────────────────────────────────────────────────
+    window.setCity = (i, val) => {
+      const ci = Number(val);
+      state[i].city = ci;
+      if (PRESETS[ci].pct !== null) state[i].cpct = PRESETS[ci].pct;
+      render();
+    };
+    window.setVal = (i, key, val) => {
+      state[i][key] = parseFloat(val) || 0;
+      updateChart();
+      // Update only computed outputs for this card without full re-render
+      const cards = document.querySelectorAll('.card');
+      const sc = state[i];
+      const { pct, tx, gross, takeHome, expenses, leftover } = calc(sc);
+      const rows = cards[i].querySelectorAll('.output-row .out-val');
+      rows[0].textContent = fmt(gross);
+      rows[1].textContent = '−' + fmt(tx.fed);
+      rows[2].textContent = '−' + fmt(tx.state);
+      rows[3].textContent = '−' + fmt(tx.fica);
+      rows[4].textContent = fmt(takeHome);
+      rows[5].textContent = '−' + fmt(expenses);
+      const lv = cards[i].querySelector('.leftover-val');
+      lv.textContent = fmt(leftover);
+      lv.className = 'leftover-val ' + (leftover >= 0 ? 'pos' : 'neg');
+    };
+    window.reset = (i) => {
+      state[i] = { ...DEFAULTS[i] };
+      render();
+    };
+
+    render();
   </script>
 </body>
 </html>
