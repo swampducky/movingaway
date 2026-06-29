@@ -4,10 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relocation Budget Tool</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,280 +16,88 @@
       padding: 20px 16px 40px;
     }
 
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: -0.3px;
-    }
+    h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.3px; }
+    .subtitle { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .header { margin-bottom: 24px; }
 
-    .subtitle {
-      color: #64748b;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .header {
-      margin-bottom: 24px;
-    }
-
-    /* CARDS GRID */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       margin-bottom: 28px;
     }
-
-    @media (max-width: 900px) {
-      .cards-grid { grid-template-columns: 1fr; }
-    }
-
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; } }
     @media (max-width: 480px) {
-      .input-row {
-        flex-wrap: wrap;
-      }
-      .input-label {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: unset;
-        min-width: 100%;
-      }
-      .input-wrap, .pct-wrap {
-        width: 100%;
-      }
-      .dollar-input, .pct-input {
-        text-align: left;
-        padding-left: 22px;
-      }
-      .chart-summary {
-        grid-template-columns: 1fr !important;
-      }
+      .input-row { flex-wrap: wrap; }
+      .input-label { white-space: normal; overflow: visible; text-overflow: unset; min-width: 100%; }
+      .input-wrap, .pct-wrap { width: 100%; }
+      .dollar-input, .pct-input { text-align: left; padding-left: 22px; }
+      .chart-summary { grid-template-columns: 1fr !important; }
     }
 
-    /* SCENARIO CARD */
-    .card {
-      background: #161b27;
-      border: 1px solid #1e2535;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
+    .card { background: #161b27; border: 1px solid #1e2535; border-radius: 10px; overflow: hidden; }
     .card-header {
-      background: #1a2033;
-      padding: 12px 14px;
-      border-bottom: 1px solid #1e2535;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      background: #1a2033; padding: 12px 14px; border-bottom: 1px solid #1e2535;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
-
-    .scenario-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #475569;
-    }
-
+    .scenario-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
     .reset-btn {
-      background: none;
-      border: 1px solid #2d3748;
-      border-radius: 5px;
-      color: #64748b;
-      font-size: 11px;
-      cursor: pointer;
-      padding: 3px 8px;
-      transition: all 0.15s;
+      background: none; border: 1px solid #2d3748; border-radius: 5px;
+      color: #64748b; font-size: 11px; cursor: pointer; padding: 3px 8px; transition: all 0.15s;
     }
-    .reset-btn:hover {
-      border-color: #4a5568;
-      color: #94a3b8;
-    }
-
+    .reset-btn:hover { border-color: #4a5568; color: #94a3b8; }
     .card-body { padding: 14px; }
 
-    /* CITY SELECT */
     .city-select {
-      width: 100%;
-      background: #0f1117;
-      border: 1px solid #2d3748;
-      border-radius: 6px;
-      color: #e2e8f0;
-      font-size: 13px;
-      padding: 7px 10px;
-      margin-bottom: 14px;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
+      width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 6px;
+      color: #e2e8f0; font-size: 13px; padding: 7px 10px; margin-bottom: 14px;
+      cursor: pointer; outline: none; appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 28px;
+      background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
     }
     .city-select:focus { border-color: #3b82f6; }
 
-    /* SECTION HEADERS */
     .section-title {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.9px;
-      color: #475569;
-      margin: 14px 0 8px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #1e2535;
-    }
-    .section-title:first-of-type { margin-top: 0; }
-
-    /* INPUT ROW */
-    .input-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 7px;
-      gap: 8px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
+      color: #475569; margin: 14px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #1e2535;
     }
 
-    .input-label {
-      color: #94a3b8;
-      font-size: 12px;
-      flex: 1;
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 8px; }
+    .input-label { color: #94a3b8; font-size: 12px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .input-wrap {
-      position: relative;
-      width: 100px;
-      flex-shrink: 0;
-    }
-
-    .input-prefix {
-      position: absolute;
-      left: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-      font-size: 12px;
-      pointer-events: none;
-    }
-
+    .input-wrap { position: relative; width: 100px; flex-shrink: 0; }
+    .input-prefix { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
     .dollar-input {
-      width: 100%;
-      background: #0f1117;
-      border: 1px solid #2d3748;
-      border-radius: 5px;
-      color: #e2e8f0;
-      font-size: 13px;
-      padding: 5px 6px 5px 18px;
-      text-align: right;
-      outline: none;
-      transition: border-color 0.15s;
+      width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 5px;
+      color: #e2e8f0; font-size: 13px; padding: 5px 6px 5px 18px; text-align: right; outline: none; transition: border-color 0.15s;
     }
     .dollar-input:focus { border-color: #3b82f6; }
-    .dollar-input[readonly] {
-      color: #64748b;
-      cursor: not-allowed;
-      background: #0a0d14;
-    }
+    .dollar-input[readonly] { color: #64748b; cursor: not-allowed; background: #0a0d14; }
 
-    /* STATE TAX INPUT (percentage) */
-    .pct-wrap {
-      position: relative;
-      width: 100px;
-      flex-shrink: 0;
-    }
-    .pct-suffix {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-      font-size: 12px;
-      pointer-events: none;
-    }
+    .pct-wrap { position: relative; width: 100px; flex-shrink: 0; }
+    .pct-suffix { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px; pointer-events: none; }
     .pct-input {
-      width: 100%;
-      background: #0f1117;
-      border: 1px solid #2d3748;
-      border-radius: 5px;
-      color: #e2e8f0;
-      font-size: 13px;
-      padding: 5px 22px 5px 8px;
-      text-align: right;
-      outline: none;
-      transition: border-color 0.15s;
+      width: 100%; background: #0f1117; border: 1px solid #2d3748; border-radius: 5px;
+      color: #e2e8f0; font-size: 13px; padding: 5px 22px 5px 8px; text-align: right; outline: none; transition: border-color 0.15s;
     }
     .pct-input:focus { border-color: #3b82f6; }
-    .pct-input[readonly] {
-      color: #64748b;
-      cursor: not-allowed;
-      background: #0a0d14;
-    }
+    .pct-input[readonly] { color: #64748b; cursor: not-allowed; background: #0a0d14; }
 
-    /* OUTPUTS */
-    .output-block {
-      margin-top: 14px;
-      background: #0f1117;
-      border: 1px solid #1e2535;
-      border-radius: 7px;
-      overflow: hidden;
-    }
-
-    .output-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 12px;
-      border-bottom: 1px solid #1a2033;
-      font-size: 12px;
-    }
+    .output-block { margin-top: 14px; background: #0f1117; border: 1px solid #1e2535; border-radius: 7px; overflow: hidden; }
+    .output-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; border-bottom: 1px solid #1a2033; font-size: 12px; }
     .output-row:last-child { border-bottom: none; }
-
     .output-label { color: #64748b; }
     .output-value { color: #94a3b8; font-variant-numeric: tabular-nums; }
     .output-value.negative { color: #f87171; }
 
-    .leftover-row {
-      background: #0d1520;
-      padding: 10px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #1e3a5f;
-    }
-    .leftover-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: #93c5fd;
-    }
-    .leftover-value {
-      font-size: 16px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
+    .leftover-row { background: #0d1520; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e3a5f; }
+    .leftover-label { font-size: 12px; font-weight: 600; color: #93c5fd; }
+    .leftover-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
     .leftover-value.positive { color: #4ade80; }
     .leftover-value.negative { color: #f87171; }
 
-    /* CHART SECTION */
-    .chart-section {
-      background: #161b27;
-      border: 1px solid #1e2535;
-      border-radius: 10px;
-      padding: 20px;
-    }
-
-    .chart-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 16px;
-    }
-
+    .chart-section { background: #161b27; border: 1px solid #1e2535; border-radius: 10px; padding: 20px; }
+    .chart-title { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 16px; }
     .recharts-cartesian-axis-tick-value { fill: #475569 !important; font-size: 11px; }
     .recharts-legend-item-text { color: #94a3b8 !important; font-size: 12px !important; }
     .recharts-tooltip-wrapper { outline: none; }
@@ -302,16 +106,19 @@
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/htm@3/dist/htm.umd.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+
+  <script>
+    const html = htm.bind(React.createElement);
     const { useState, useCallback } = React;
-    const {
-      BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-      Legend, ResponsiveContainer, ReferenceLine
-    } = Recharts;
+    const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Cell } = Recharts;
 
     // ── Tax helpers ──────────────────────────────────────────────────────────
 
-    const FED_BRACKETS_2025 = [
+    const FED_BRACKETS = [
       { rate: 0.10, limit: 11925 },
       { rate: 0.12, limit: 48475 },
       { rate: 0.22, limit: 103350 },
@@ -320,13 +127,11 @@
       { rate: 0.35, limit: 626350 },
       { rate: 0.37, limit: Infinity },
     ];
-    const STANDARD_DEDUCTION = 15000;
 
-    function calcFederalTax(annualGross) {
-      const taxable = Math.max(0, annualGross - STANDARD_DEDUCTION);
-      let tax = 0;
-      let prev = 0;
-      for (const { rate, limit } of FED_BRACKETS_2025) {
+    function calcFederalTax(gross) {
+      const taxable = Math.max(0, gross - 15000);
+      let tax = 0, prev = 0;
+      for (const { rate, limit } of FED_BRACKETS) {
         if (taxable <= prev) break;
         tax += (Math.min(taxable, limit) - prev) * rate;
         prev = limit;
@@ -334,426 +139,232 @@
       return tax;
     }
 
-    function calcFICA(annualGross) {
-      const ss = Math.min(annualGross, 176100) * 0.062;
-      const medicare = annualGross * 0.0145;
-      return ss + medicare;
-    }
-
-    function calcTaxes(annualGross, statePct) {
-      const fedTax = calcFederalTax(annualGross);
-      const stateTax = annualGross * (statePct / 100);
-      const fica = calcFICA(annualGross);
-      const totalAnnualTax = fedTax + stateTax + fica;
+    function calcTaxes(gross, statePct) {
+      const fed = calcFederalTax(gross);
+      const state = gross * (statePct / 100);
+      const fica = Math.min(gross, 176100) * 0.062 + gross * 0.0145;
       return {
-        fedMonthly: fedTax / 12,
-        stateMonthly: stateTax / 12,
+        fedMonthly: fed / 12,
+        stateMonthly: state / 12,
         ficaMonthly: fica / 12,
-        totalMonthly: totalAnnualTax / 12,
+        totalMonthly: (fed + state + fica) / 12,
       };
     }
 
-    // ── City presets ─────────────────────────────────────────────────────────
-
-    const CITY_PRESETS = [
-      { label: "SLC / Lehi, UT (Baseline)", statePct: 4.65 },
-      { label: "Gilbert / Mesa, AZ",         statePct: 2.5  },
-      { label: "Spokane, WA",                statePct: 0    },
-      { label: "Coeur d'Alene / Rathdrum, ID", statePct: 5.8 },
-      { label: "Custom",                     statePct: null },
-    ];
-
-    const DEFAULT_SCENARIOS = [
-      {
-        city: 0,
-        customStatePct: 4.65,
-        salary: 95000,
-        rent: 1850,
-        car: 650,
-        groceries: 500,
-        subs: 200,
-        debt: 400,
-        misc: 250,
-      },
-      {
-        city: 1,
-        customStatePct: 2.5,
-        salary: 95000,
-        rent: 2100,
-        car: 650,
-        groceries: 520,
-        subs: 200,
-        debt: 400,
-        misc: 250,
-      },
-      {
-        city: 2,
-        customStatePct: 0,
-        salary: 95000,
-        rent: 1700,
-        car: 650,
-        groceries: 480,
-        subs: 200,
-        debt: 400,
-        misc: 250,
-      },
-    ];
-
-    // ── Formatting ───────────────────────────────────────────────────────────
-
-    function fmt(n, opts = {}) {
-      const abs = Math.abs(n);
-      const str = abs.toLocaleString("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-        ...opts,
-      });
-      return n < 0 ? `-$${str}` : `$${str}`;
+    function fmt(n) {
+      const s = Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+      return (n < 0 ? '-$' : '$') + s;
     }
 
-    // ── Numeric input ────────────────────────────────────────────────────────
+    // ── Presets & defaults ────────────────────────────────────────────────────
 
-    function DollarInput({ value, onChange, readOnly = false }) {
+    const PRESETS = [
+      { label: "SLC / Lehi, UT (Baseline)",      statePct: 4.65 },
+      { label: "Gilbert / Mesa, AZ",              statePct: 2.5  },
+      { label: "Spokane, WA",                     statePct: 0    },
+      { label: "Coeur d'Alene / Rathdrum, ID",    statePct: 5.8  },
+      { label: "Custom",                          statePct: null },
+    ];
+
+    const DEFAULTS = [
+      { city: 0, customPct: 4.65, salary: 95000, rent: 1850, car: 650, groceries: 500, subs: 200, debt: 400, misc: 250 },
+      { city: 1, customPct: 2.5,  salary: 95000, rent: 2100, car: 650, groceries: 520, subs: 200, debt: 400, misc: 250 },
+      { city: 2, customPct: 0,    salary: 95000, rent: 1700, car: 650, groceries: 480, subs: 200, debt: 400, misc: 250 },
+    ];
+
+    const COLORS = ['#3b82f6', '#a78bfa', '#34d399'];
+    const NAMES  = ['Scenario A', 'Scenario B', 'Scenario C'];
+
+    // ── DollarInput ───────────────────────────────────────────────────────────
+
+    function DollarInput({ value, onChange, readOnly }) {
       const [raw, setRaw] = useState(String(value));
       const [focused, setFocused] = useState(false);
-
-      const displayed = focused ? raw : String(value);
-
-      return (
+      return html`
         <div className="input-wrap">
           <span className="input-prefix">$</span>
           <input
             className="dollar-input"
-            type="number"
-            min="0"
-            step="50"
-            readOnly={readOnly}
-            value={displayed}
-            onFocus={() => { setFocused(true); setRaw(String(value)); }}
-            onBlur={() => {
-              setFocused(false);
-              const n = parseFloat(raw);
-              if (!isNaN(n) && n >= 0) onChange(n);
-            }}
-            onChange={e => {
-              setRaw(e.target.value);
-              const n = parseFloat(e.target.value);
-              if (!isNaN(n) && n >= 0) onChange(n);
-            }}
+            type="number" min="0" step="50"
+            readOnly=${!!readOnly}
+            value=${focused ? raw : String(value)}
+            onFocus=${() => { setFocused(true); setRaw(String(value)); }}
+            onBlur=${() => { setFocused(false); const n = parseFloat(raw); if (!isNaN(n) && n >= 0) onChange(n); }}
+            onChange=${e => { setRaw(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n) && n >= 0) onChange(n); }}
           />
-        </div>
-      );
+        </div>`;
     }
 
-    function PctInput({ value, onChange, readOnly = false }) {
+    // ── PctInput ──────────────────────────────────────────────────────────────
+
+    function PctInput({ value, onChange, readOnly }) {
       const [raw, setRaw] = useState(String(value));
       const [focused, setFocused] = useState(false);
-      const displayed = focused ? raw : String(value);
-
-      return (
+      return html`
         <div className="pct-wrap">
           <input
             className="pct-input"
-            type="number"
-            min="0"
-            max="20"
-            step="0.1"
-            readOnly={readOnly}
-            value={displayed}
-            onFocus={() => { setFocused(true); setRaw(String(value)); }}
-            onBlur={() => {
-              setFocused(false);
-              const n = parseFloat(raw);
-              if (!isNaN(n)) onChange(n);
-            }}
-            onChange={e => {
-              setRaw(e.target.value);
-              const n = parseFloat(e.target.value);
-              if (!isNaN(n)) onChange(n);
-            }}
+            type="number" min="0" max="20" step="0.1"
+            readOnly=${!!readOnly}
+            value=${focused ? raw : String(value)}
+            onFocus=${() => { setFocused(true); setRaw(String(value)); }}
+            onBlur=${() => { setFocused(false); const n = parseFloat(raw); if (!isNaN(n)) onChange(n); }}
+            onChange=${e => { setRaw(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n)) onChange(n); }}
           />
           <span className="pct-suffix">%</span>
-        </div>
-      );
+        </div>`;
     }
 
-    // ── ScenarioCard ─────────────────────────────────────────────────────────
+    // ── ScenarioCard ──────────────────────────────────────────────────────────
 
-    const SCENARIO_COLORS = ["#3b82f6", "#a78bfa", "#34d399"];
-    const SCENARIO_NAMES = ["Scenario A", "Scenario B", "Scenario C"];
+    function ScenarioCard({ idx, sc, onChange, onReset }) {
+      const isCustom = sc.city === PRESETS.length - 1;
+      const statePct = isCustom ? sc.customPct : PRESETS[sc.city].statePct;
+      const taxes = calcTaxes(sc.salary, statePct);
+      const gross = sc.salary / 12;
+      const takeHome = gross - taxes.totalMonthly;
+      const expenses = sc.rent + sc.car + sc.groceries + sc.subs + sc.debt + sc.misc;
+      const leftover = takeHome - expenses;
+      const set = k => v => onChange({ ...sc, [k]: v });
+      const color = COLORS[idx];
 
-    function ScenarioCard({ idx, scenario, onChange, onReset }) {
-      const preset = CITY_PRESETS[scenario.city];
-      const isCustom = scenario.city === CITY_PRESETS.length - 1;
-      const statePct = isCustom ? scenario.customStatePct : preset.statePct;
+      const expenseRows = [
+        ['Rent / mortgage',      'rent'],
+        ['Car (pmt + ins + gas)','car'],
+        ['Groceries',            'groceries'],
+        ['Subs / hobbies',       'subs'],
+        ['Debt payments',        'debt'],
+        ['Miscellaneous',        'misc'],
+      ];
 
-      const taxes = calcTaxes(scenario.salary, statePct);
-      const monthlyGross = scenario.salary / 12;
-      const monthlyTakeHome = monthlyGross - taxes.totalMonthly;
-      const totalExpenses =
-        scenario.rent + scenario.car + scenario.groceries +
-        scenario.subs + scenario.debt + scenario.misc;
-      const leftover = monthlyTakeHome - totalExpenses;
-
-      const set = (key) => (val) => onChange({ ...scenario, [key]: val });
-
-      const accentColor = SCENARIO_COLORS[idx];
-
-      return (
-        <div className="card" style={{ borderTopColor: accentColor, borderTopWidth: 2 }}>
+      return html`
+        <div className="card" style=${{ borderTopColor: color, borderTopWidth: 2 }}>
           <div className="card-header">
-            <span className="scenario-label" style={{ color: accentColor }}>
-              {SCENARIO_NAMES[idx]}
-            </span>
-            <button className="reset-btn" onClick={onReset}>Reset</button>
+            <span className="scenario-label" style=${{ color }}>${NAMES[idx]}</span>
+            <button className="reset-btn" onClick=${onReset}>Reset</button>
           </div>
-
           <div className="card-body">
-            {/* City preset */}
-            <select
-              className="city-select"
-              value={scenario.city}
-              onChange={e => {
+            <select className="city-select" value=${sc.city}
+              onChange=${e => {
                 const ci = Number(e.target.value);
-                const newStatePct = CITY_PRESETS[ci].statePct ?? scenario.customStatePct;
-                onChange({ ...scenario, city: ci, customStatePct: newStatePct ?? scenario.customStatePct });
-              }}
-            >
-              {CITY_PRESETS.map((p, i) => (
-                <option key={i} value={i}>{p.label}</option>
-              ))}
+                onChange({ ...sc, city: ci, customPct: PRESETS[ci].statePct ?? sc.customPct });
+              }}>
+              ${PRESETS.map((p, i) => html`<option key=${i} value=${i}>${p.label}</option>`)}
             </select>
 
-            {/* Income */}
             <div className="section-title">Income</div>
-
             <div className="input-row">
               <span className="input-label">Annual salary</span>
-              <DollarInput value={scenario.salary} onChange={set("salary")} />
+              <${DollarInput} value=${sc.salary} onChange=${set('salary')} />
             </div>
-
             <div className="input-row">
               <span className="input-label">State income tax</span>
-              <PctInput
-                value={statePct}
-                readOnly={!isCustom}
-                onChange={v => onChange({ ...scenario, customStatePct: v })}
-              />
+              <${PctInput} value=${statePct} readOnly=${!isCustom}
+                onChange=${v => onChange({ ...sc, customPct: v })} />
             </div>
 
-            {/* Expenses */}
             <div className="section-title">Monthly Expenses</div>
+            ${expenseRows.map(([label, key]) => html`
+              <div className="input-row" key=${key}>
+                <span className="input-label">${label}</span>
+                <${DollarInput} value=${sc[key]} onChange=${set(key)} />
+              </div>`)}
 
-            {[
-              ["Rent / mortgage", "rent"],
-              ["Car (pmt + ins + gas)", "car"],
-              ["Groceries", "groceries"],
-              ["Subs / hobbies", "subs"],
-              ["Debt payments", "debt"],
-              ["Miscellaneous", "misc"],
-            ].map(([label, key]) => (
-              <div className="input-row" key={key}>
-                <span className="input-label">{label}</span>
-                <DollarInput value={scenario[key]} onChange={set(key)} />
-              </div>
-            ))}
-
-            {/* Calculated outputs */}
             <div className="output-block">
-              <div className="output-row">
-                <span className="output-label">Monthly gross</span>
-                <span className="output-value">{fmt(monthlyGross)}</span>
-              </div>
-              <div className="output-row">
-                <span className="output-label">Federal tax</span>
-                <span className="output-value negative">−{fmt(taxes.fedMonthly)}</span>
-              </div>
-              <div className="output-row">
-                <span className="output-label">State tax ({statePct}%)</span>
-                <span className="output-value negative">−{fmt(taxes.stateMonthly)}</span>
-              </div>
-              <div className="output-row">
-                <span className="output-label">FICA (SS + Medicare)</span>
-                <span className="output-value negative">−{fmt(taxes.ficaMonthly)}</span>
-              </div>
-              <div className="output-row">
-                <span className="output-label">Monthly take-home</span>
-                <span className="output-value" style={{ color: "#93c5fd" }}>{fmt(monthlyTakeHome)}</span>
-              </div>
-              <div className="output-row">
-                <span className="output-label">Total expenses</span>
-                <span className="output-value negative">−{fmt(totalExpenses)}</span>
-              </div>
+              <div className="output-row"><span className="output-label">Monthly gross</span><span className="output-value">${fmt(gross)}</span></div>
+              <div className="output-row"><span className="output-label">Federal tax</span><span className="output-value negative">−${fmt(taxes.fedMonthly)}</span></div>
+              <div className="output-row"><span className="output-label">State tax (${statePct}%)</span><span className="output-value negative">−${fmt(taxes.stateMonthly)}</span></div>
+              <div className="output-row"><span className="output-label">FICA (SS + Medicare)</span><span className="output-value negative">−${fmt(taxes.ficaMonthly)}</span></div>
+              <div className="output-row"><span className="output-label">Monthly take-home</span><span className="output-value" style=${{ color: '#93c5fd' }}>${fmt(takeHome)}</span></div>
+              <div className="output-row"><span className="output-label">Total expenses</span><span className="output-value negative">−${fmt(expenses)}</span></div>
             </div>
 
             <div className="leftover-row">
               <span className="leftover-label">Monthly leftover</span>
-              <span className={`leftover-value ${leftover >= 0 ? "positive" : "negative"}`}>
-                {fmt(leftover)}
-              </span>
+              <span className=${'leftover-value ' + (leftover >= 0 ? 'positive' : 'negative')}>${fmt(leftover)}</span>
             </div>
           </div>
-        </div>
-      );
+        </div>`;
     }
 
-    // ── Comparison chart ─────────────────────────────────────────────────────
+    // ── ComparisonChart ───────────────────────────────────────────────────────
 
     function ComparisonChart({ scenarios }) {
-      const chartData = scenarios.map((sc, i) => {
-        const preset = CITY_PRESETS[sc.city];
-        const isCustom = sc.city === CITY_PRESETS.length - 1;
-        const statePct = isCustom ? sc.customStatePct : preset.statePct;
+      const data = scenarios.map((sc, i) => {
+        const isCustom = sc.city === PRESETS.length - 1;
+        const statePct = isCustom ? sc.customPct : PRESETS[sc.city].statePct;
         const taxes = calcTaxes(sc.salary, statePct);
-        const monthlyTakeHome = sc.salary / 12 - taxes.totalMonthly;
-        const totalExpenses = sc.rent + sc.car + sc.groceries + sc.subs + sc.debt + sc.misc;
-        const leftover = Math.round(monthlyTakeHome - totalExpenses);
-        const label = isCustom ? "Custom" : preset.label.split(",")[0];
-
-        return {
-          name: label,
-          "Take-home": Math.round(monthlyTakeHome),
-          "Expenses": Math.round(totalExpenses),
-          "Leftover": leftover,
-          color: SCENARIO_COLORS[i],
-        };
+        const takeHome = Math.round(sc.salary / 12 - taxes.totalMonthly);
+        const expenses = Math.round(sc.rent + sc.car + sc.groceries + sc.subs + sc.debt + sc.misc);
+        const leftover = takeHome - expenses;
+        const name = isCustom ? 'Custom' : PRESETS[sc.city].label.split(',')[0];
+        return { name, 'Take-home': takeHome, 'Expenses': expenses, 'Leftover': leftover };
       });
 
-      const CustomTooltip = ({ active, payload, label }) => {
-        if (!active || !payload?.length) return null;
-        return (
-          <div style={{
-            background: "#1a2033",
-            border: "1px solid #2d3748",
-            borderRadius: 7,
-            padding: "10px 14px",
-            fontSize: 12,
-          }}>
-            <div style={{ color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>{label}</div>
-            {payload.map(p => (
-              <div key={p.name} style={{ color: p.color, marginBottom: 3 }}>
-                {p.name}: <strong>{fmt(p.value)}</strong>
-              </div>
-            ))}
-          </div>
-        );
-      };
+      function CustomTooltip({ active, payload, label }) {
+        if (!active || !payload || !payload.length) return null;
+        return html`
+          <div style=${{ background: '#1a2033', border: '1px solid #2d3748', borderRadius: 7, padding: '10px 14px', fontSize: 12 }}>
+            <div style=${{ color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>${label}</div>
+            ${payload.map(p => html`<div key=${p.name} style=${{ color: p.color, marginBottom: 3 }}>${p.name}: <strong>${fmt(p.value)}</strong></div>`)}
+          </div>`;
+      }
 
-      return (
+      return html`
         <div className="chart-section">
           <div className="chart-title">Monthly Budget Comparison</div>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={chartData} barGap={4} barCategoryGap="30%">
-              <CartesianGrid stroke="#1e2535" vertical={false} />
-              <XAxis
-                dataKey="name"
-                tick={{ fill: "#475569", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-                tick={{ fill: "#475569", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                width={48}
-              />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-              <Legend
-                wrapperStyle={{ fontSize: 12, color: "#64748b", paddingTop: 12 }}
-              />
-              <ReferenceLine y={0} stroke="#2d3748" />
-              <Bar dataKey="Take-home" fill="#3b82f6" radius={[3,3,0,0]} />
-              <Bar dataKey="Expenses" fill="#475569" radius={[3,3,0,0]} />
-              <Bar dataKey="Leftover" radius={[3,3,0,0]}
-                   fill="#4ade80"
-                   label={false}
-                   /* color per bar via Cell isn't needed — all positive is green */
-              >
-                {chartData.map((entry, i) => (
-                  <Recharts.Cell
-                    key={i}
-                    fill={entry.Leftover >= 0 ? "#4ade80" : "#f87171"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <${ResponsiveContainer} width="100%" height=${260}>
+            <${BarChart} data=${data} barGap=${4} barCategoryGap="30%">
+              <${CartesianGrid} stroke="#1e2535" vertical=${false} />
+              <${XAxis} dataKey="name" tick=${{ fill: '#475569', fontSize: 11 }} axisLine=${false} tickLine=${false} />
+              <${YAxis} tickFormatter=${v => '$' + (v/1000).toFixed(0) + 'k'} tick=${{ fill: '#475569', fontSize: 11 }} axisLine=${false} tickLine=${false} width=${48} />
+              <${Tooltip} content=${html`<${CustomTooltip} />`} cursor=${{ fill: 'rgba(255,255,255,0.03)' }} />
+              <${Legend} wrapperStyle=${{ fontSize: 12, paddingTop: 12 }} />
+              <${ReferenceLine} y=${0} stroke="#2d3748" />
+              <${Bar} dataKey="Take-home" fill="#3b82f6" radius=${[3,3,0,0]} />
+              <${Bar} dataKey="Expenses" fill="#475569" radius=${[3,3,0,0]} />
+              <${Bar} dataKey="Leftover" radius=${[3,3,0,0]} fill="#4ade80">
+                ${data.map((d, i) => html`<${Cell} key=${i} fill=${d['Leftover'] >= 0 ? '#4ade80' : '#f87171'} />`)}
+              </${Bar}>
+            </${BarChart}>
+          </${ResponsiveContainer}>
 
-          {/* Summary row */}
-          <div className="chart-summary" style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 10,
-            marginTop: 16,
-          }}>
-            {chartData.map((d, i) => (
-              <div key={i} style={{
-                background: "#0f1117",
-                border: `1px solid ${SCENARIO_COLORS[i]}33`,
-                borderRadius: 7,
-                padding: "10px 14px",
-                textAlign: "center",
-              }}>
-                <div style={{ fontSize: 10, color: SCENARIO_COLORS[i], fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 4 }}>
-                  {SCENARIO_NAMES[i]}
+          <div className="chart-summary" style=${{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 16 }}>
+            ${data.map((d, i) => html`
+              <div key=${i} style=${{ background: '#0f1117', border: '1px solid ' + COLORS[i] + '33', borderRadius: 7, padding: '10px 14px', textAlign: 'center' }}>
+                <div style=${{ fontSize: 10, color: COLORS[i], fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 4 }}>${NAMES[i]}</div>
+                <div style=${{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>${d.name}</div>
+                <div style=${{ fontSize: 18, fontWeight: 700, color: d['Leftover'] >= 0 ? '#4ade80' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                  ${fmt(d['Leftover'])}<span style=${{ fontSize: 11, fontWeight: 400, color: '#475569' }}>/mo</span>
                 </div>
-                <div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>{d.name}</div>
-                <div style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: d.Leftover >= 0 ? "#4ade80" : "#f87171",
-                  fontVariantNumeric: "tabular-nums",
-                }}>
-                  {fmt(d.Leftover)}<span style={{ fontSize: 11, fontWeight: 400, color: "#475569" }}>/mo</span>
-                </div>
-              </div>
-            ))}
+              </div>`)}
           </div>
-        </div>
-      );
+        </div>`;
     }
 
-    // ── App ──────────────────────────────────────────────────────────────────
+    // ── App ───────────────────────────────────────────────────────────────────
 
     function App() {
-      const [scenarios, setScenarios] = useState(DEFAULT_SCENARIOS);
+      const [scenarios, setScenarios] = useState(DEFAULTS);
+      const update = useCallback((i, sc) => setScenarios(prev => prev.map((s, j) => j === i ? sc : s)), []);
+      const reset  = useCallback((i)     => setScenarios(prev => prev.map((s, j) => j === i ? DEFAULTS[i] : s)), []);
 
-      const updateScenario = useCallback((idx, sc) => {
-        setScenarios(prev => prev.map((s, i) => i === idx ? sc : s));
-      }, []);
-
-      const resetScenario = useCallback((idx) => {
-        setScenarios(prev => prev.map((s, i) => i === idx ? DEFAULT_SCENARIOS[idx] : s));
-      }, []);
-
-      return (
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      return html`
+        <div style=${{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="header">
             <h1>Relocation Budget Planner</h1>
-            <p className="subtitle">
-              Rough planning estimate only — not tax advice. Federal brackets 2025, standard deduction $15,000.
-            </p>
+            <p className="subtitle">Rough planning estimate — not tax advice. 2025 federal brackets, $15k standard deduction.</p>
           </div>
-
           <div className="cards-grid">
-            {scenarios.map((sc, i) => (
-              <ScenarioCard
-                key={i}
-                idx={i}
-                scenario={sc}
-                onChange={(s) => updateScenario(i, s)}
-                onReset={() => resetScenario(i)}
-              />
-            ))}
+            ${scenarios.map((sc, i) => html`
+              <${ScenarioCard} key=${i} idx=${i} sc=${sc}
+                onChange=${s => update(i, s)} onReset=${() => reset(i)} />`)}
           </div>
-
-          <ComparisonChart scenarios={scenarios} />
-        </div>
-      );
+          <${ComparisonChart} scenarios=${scenarios} />
+        </div>`;
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
   </script>
 </body>
 </html>
