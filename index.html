@@ -49,6 +49,28 @@
       .cards-grid { grid-template-columns: 1fr; }
     }
 
+    @media (max-width: 480px) {
+      .input-row {
+        flex-wrap: wrap;
+      }
+      .input-label {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        min-width: 100%;
+      }
+      .input-wrap, .pct-wrap {
+        width: 100%;
+      }
+      .dollar-input, .pct-input {
+        text-align: left;
+        padding-left: 22px;
+      }
+      .chart-summary {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
     /* SCENARIO CARD */
     .card {
       background: #161b27;
@@ -659,7 +681,7 @@
           </ResponsiveContainer>
 
           {/* Summary row */}
-          <div style={{
+          <div className="chart-summary" style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
             gap: 10,
